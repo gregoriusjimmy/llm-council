@@ -33,6 +33,13 @@ st.sidebar.title("🏛️ Council Configuration")
 
 # Model Selection
 available_models = get_installed_models()
+
+# Add Cloud Models (Requires Internet)
+cloud_models = ["kimi-k2-thinking:cloud", "minimax-m2:cloud"]
+for m in cloud_models:
+    if m not in available_models:
+        available_models.append(m)
+
 if not available_models:
     st.sidebar.error("No Ollama models found! Please install Ollama and pull models (see README).")
 
