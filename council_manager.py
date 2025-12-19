@@ -10,7 +10,6 @@ class CouncilMember:
 
 class CouncilManager:
     def __init__(self):
-        self.client = AsyncClient()
         self.members = []
         self.chairman = None
 
@@ -24,8 +23,9 @@ class CouncilManager:
 
     async def check_models_availability(self):
         """Checks which requested models are actually available locally."""
+        client = AsyncClient()
         try:
-            available = await self.client.list()
+            available = await client.list()
             available_names = [m['name'] for m in available['models']]
             
             missing = []
@@ -44,6 +44,7 @@ class CouncilManager:
 
     async def _get_member_response(self, member, prompt, history=None, timeout=120):
         """Gets a response from a single member with timeout."""
+        client = AsyncClient()
         system_prompt = f"You are {member.name}. {member.role_description}"
         
         messages = [{'role': 'system', 'content': system_prompt}]
@@ -120,7 +121,7 @@ class CouncilManager:
         messages.append({'role': 'user', 'content': final_prompt})
 
         # Return a generator/async iterator for streaming
-        return await self.client.chat(model=self.chairman.model, messages=messages, stream=True)
+        return await client.chat(model=self.chairman.model, messages=messages, stream=True)
 
 # Default configuration helper
 def get_default_council():
