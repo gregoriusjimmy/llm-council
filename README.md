@@ -17,19 +17,20 @@ Ollama is the engine that runs the AI models locally for free.
 3.  Open a Command Prompt (cmd) or PowerShell and run the following commands to download the **Next-Gen Council** models (High Performance):
 
     ```bash
-    # The Chairman (Reasoning Expert)
+    # The Chairman (DeepSeek V3.2 - Cloud)
+    # Requires Internet, uses remote processing
+    ollama pull deepseek-v3.2:cloud
+
+    # The Thinker (Moonshot AI - Cloud)
+    ollama pull kimi-k2-thinking:cloud
+
+    # The Agent (MiniMax - Cloud)
+    ollama pull minimax-m2:cloud
+
+    # Local Fallback (Privacy Focused)
     ollama pull deepseek-r1
-
-    # The Thinker (Moonshot AI's reasoning model)
-    ollama pull kimi-k2-thinking
-
-    # The Agent (Minimax's coding/agent model)
-    ollama pull minimax-m2
-
-    # The Generalist (OpenAI's open model)
-    ollama pull gpt-oss:20b
     ```
-    *Note: These models are large. If you have less than 16GB RAM, stick to smaller models like `llama3` and `gemma:2b`.*
+    *Note: The `:cloud` models are free but require an internet connection as they run on remote servers. For fully offline use, use `deepseek-r1`, `llama3`, or `mistral`.*
 
 ## Installation
 
