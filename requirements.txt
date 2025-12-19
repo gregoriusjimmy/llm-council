@@ -1,0 +1,8 @@
+streamlit
+ollama
+edge-tts
+SpeechRecognition
+pyaudio
+pygame
+python-dotenv
+openai-whisper
