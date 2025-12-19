@@ -136,7 +136,7 @@ if user_input:
             
             st.write("2. Chairman is critiquing and synthesizing...")
             # Chairman streaming response
-            stream = await st.session_state.council_manager.synthesize(user_input, council_results, st.session_state.messages)
+            stream = st.session_state.council_manager.synthesize(user_input, council_results, st.session_state.messages)
             
             status.update(label="Council has spoken!", state="complete", expanded=False)
 

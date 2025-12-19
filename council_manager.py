@@ -23,10 +23,10 @@ class CouncilManager:
 
     async def check_models_availability(self):
         """Checks which requested models are actually available locally."""
-        client = AsyncClient()
         try:
-            available = await client.list()
-            available_names = [m['name'] for m in available['models']]
+            async with AsyncClient() as client:
+                available = await client.list()
+                available_names = [m['name'] for m in available['models']]
             
             missing = []
             all_requested = set([m.model for m in self.members] + [self.chairman.model])
@@ -44,7 +44,6 @@ class CouncilManager:
 
     async def _get_member_response(self, member, prompt, history=None, timeout=120):
         """Gets a response from a single member with timeout."""
-        client = AsyncClient()
         system_prompt = f"You are {member.name}. {member.role_description}"
         
         messages = [{'role': 'system', 'content': system_prompt}]
@@ -58,17 +57,18 @@ class CouncilManager:
         messages.append({'role': 'user', 'content': prompt})
 
         try:
-            # Use asyncio.wait_for to enforce timeout
-            response = await asyncio.wait_for(
-                client.chat(model=member.model, messages=messages),
-                timeout=timeout
-            )
-            return {
-                "name": member.name,
-                "model": member.model,
-                "content": response['message']['content'],
-                "status": "success"
-            }
+            async with AsyncClient() as client:
+                # Use asyncio.wait_for to enforce timeout
+                response = await asyncio.wait_for(
+                    client.chat(model=member.model, messages=messages),
+                    timeout=timeout
+                )
+                return {
+                    "name": member.name,
+                    "model": member.model,
+                    "content": response['message']['content'],
+                    "status": "success"
+                }
         except asyncio.TimeoutError:
             return {
                 "name": member.name,
@@ -93,7 +93,6 @@ class CouncilManager:
 
     async def synthesize(self, prompt, council_results, history=None):
         """Chairman synthesizes the results after a critique phase (Supports Streaming)."""
-        client = AsyncClient()
         
         # 1. Prepare Initial Opinions
         context = f"The user asked: '{prompt}'\n\nHere are the initial opinions from the council:\n\n"
@@ -122,7 +121,10 @@ class CouncilManager:
         messages.append({'role': 'user', 'content': final_prompt})
 
         # Return a generator/async iterator for streaming
-        return await client.chat(model=self.chairman.model, messages=messages, stream=True)
+        async with AsyncClient() as client:
+            stream = await client.chat(model=self.chairman.model, messages=messages, stream=True)
+            async for chunk in stream:
+                yield chunk
 
 # Default configuration helper
 def get_default_council():
