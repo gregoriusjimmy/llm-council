@@ -26,7 +26,7 @@ def get_installed_models():
         # 'models' key contains a list of dicts
         return [m['name'] for m in models_info['models']]
     except:
-        return ["deepseek-r1", "kimi-k2-thinking", "minimax-m2", "gpt-oss:20b"] # Fallback suggestion
+        return ["deepseek-v3.2:cloud", "kimi-k2-thinking:cloud", "minimax-m2:cloud", "gpt-oss:20b"] # Fallback suggestion
 
 # Sidebar Configuration
 st.sidebar.title("🏛️ Council Configuration")
@@ -35,7 +35,7 @@ st.sidebar.title("🏛️ Council Configuration")
 available_models = get_installed_models()
 
 # Add Cloud Models (Requires Internet)
-cloud_models = ["kimi-k2-thinking:cloud", "minimax-m2:cloud"]
+cloud_models = ["kimi-k2-thinking:cloud", "minimax-m2:cloud", "deepseek-v3.2:cloud"]
 for m in cloud_models:
     if m not in available_models:
         available_models.append(m)
@@ -46,9 +46,11 @@ if not available_models:
 # Chairman Selection
 chairman_index = 0
 for i, m in enumerate(available_models):
-    if "deepseek-r1" in m:
+    if "deepseek-v3.2" in m:
         chairman_index = i
         break
+    elif "deepseek-r1" in m and chairman_index == 0: # Fallback to R1 if V3.2 not found
+        chairman_index = i
 chairman_model = st.sidebar.selectbox("Chairman Model", available_models, index=chairman_index if available_models else 0)
 
 st.sidebar.subheader("Council Members")

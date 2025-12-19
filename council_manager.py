@@ -128,5 +128,5 @@ def get_default_council():
     return [
         CouncilMember("The Reasoner", "kimi-k2-thinking:cloud", "You are a deep thinker. Break down the user's problem step-by-step."),
         CouncilMember("The Engineer", "minimax-m2:cloud", "You are an engineer. Focus on practical implementation, code, and efficiency."),
-        CouncilMember("The Generalist", "deepseek-r1", "You are a balanced assistant. Provide clear, direct answers.")
+        CouncilMember("The Generalist", "deepseek-v3.2:cloud", "You are a balanced assistant. Provide clear, direct answers.")
     ]
