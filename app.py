@@ -118,44 +118,42 @@ if user_input:
     # Process with Council
     st.session_state.council_manager.set_council(members, chairman_model)
     
-    # 1. Gather Opinions
-    with st.status("The Council is deliberating...", expanded=True) as status:
-        st.write("1. Council members are thinking...")
-        # Pass history to council members
-        council_results = asyncio.run(st.session_state.council_manager.get_council_responses(user_input, st.session_state.messages))
-        
-        # Show individual opinions in an expander
-        with st.expander("View Individual Council Opinions"):
-            for res in council_results:
-                st.markdown(f"**{res['name']} ({res['model']})**")
-                if res['status'] == 'success':
-                    st.info(res['content'])
-                else:
-                    st.error(res['content'])
-        
-        st.write("2. Chairman is critiquing and synthesizing...")
-        # Chairman streaming response
-        stream = asyncio.run(st.session_state.council_manager.synthesize(user_input, council_results, st.session_state.messages))
-        
-        status.update(label="Council has spoken!", state="complete", expanded=False)
-
-    # Stream Chairman's Response
-    with chat_container:
-        with st.chat_message("assistant", avatar="🏛️"):
-            # Stream the response
-            response_placeholder = st.empty()
-            full_response = ""
+    async def process_council_request():
+        # 1. Gather Opinions
+        with st.status("The Council is deliberating...", expanded=True) as status:
+            st.write("1. Council members are thinking...")
+            # Pass history to council members
+            council_results = await st.session_state.council_manager.get_council_responses(user_input, st.session_state.messages)
             
-            # Iterate over the async generator
-            async def consume_stream():
-                nonlocal full_response
+            # Show individual opinions in an expander
+            with st.expander("View Individual Council Opinions"):
+                for res in council_results:
+                    st.markdown(f"**{res['name']} ({res['model']})**")
+                    if res['status'] == 'success':
+                        st.info(res['content'])
+                    else:
+                        st.error(res['content'])
+            
+            st.write("2. Chairman is critiquing and synthesizing...")
+            # Chairman streaming response
+            stream = await st.session_state.council_manager.synthesize(user_input, council_results, st.session_state.messages)
+            
+            status.update(label="Council has spoken!", state="complete", expanded=False)
+
+        # Stream Chairman's Response
+        full_resp = ""
+        with chat_container:
+            with st.chat_message("assistant", avatar="🏛️"):
+                response_placeholder = st.empty()
                 async for chunk in stream:
                     content = chunk['message']['content']
-                    full_response += content
-                    response_placeholder.markdown(full_response + "▌")
-                response_placeholder.markdown(full_response)
-            
-            asyncio.run(consume_stream())
+                    full_resp += content
+                    response_placeholder.markdown(full_resp + "▌")
+                response_placeholder.markdown(full_resp)
+        return full_resp
+
+    # Run the async process
+    full_response = asyncio.run(process_council_request())
     
     # Save Assistant Message
     st.session_state.messages.append({"role": "assistant", "content": full_response})
