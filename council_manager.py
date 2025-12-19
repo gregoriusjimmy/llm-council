@@ -60,7 +60,7 @@ class CouncilManager:
         try:
             # Use asyncio.wait_for to enforce timeout
             response = await asyncio.wait_for(
-                self.client.chat(model=member.model, messages=messages),
+                client.chat(model=member.model, messages=messages),
                 timeout=timeout
             )
             return {
@@ -93,6 +93,7 @@ class CouncilManager:
 
     async def synthesize(self, prompt, council_results, history=None):
         """Chairman synthesizes the results after a critique phase (Supports Streaming)."""
+        client = AsyncClient()
         
         # 1. Prepare Initial Opinions
         context = f"The user asked: '{prompt}'\n\nHere are the initial opinions from the council:\n\n"
